@@ -5,10 +5,10 @@
 #include <sys/time.h>
 #include <cstdlib>
 
-#define SEPALLOC
 
 class Matrix;
 double** ndarray(int, int);
+double** separate_alloc(int, int);
 Matrix* matmul(const Matrix*, const Matrix*);
 
 class Matrix {
@@ -122,13 +122,7 @@ int main(int argc, const char * argv[]) {
 	//std::cout << num_rows << " " << num_cols << std::endl;
 
 	Matrix* matrix = new Matrix(dim1, dim2);
-	matrix->arange();
-	matrix->print();
-
-	Matrix* x = new Matrix(dim3, dim3);
-	x->arange();
-	x->eye();
-	x->print();
+	Matrix* x = new Matrix(dim2, dim3);
 	
 	struct timeval tv_1, tv_2;
 
@@ -140,9 +134,6 @@ int main(int argc, const char * argv[]) {
 	retval = gettimeofday(&tv_2, 0);
 	if (retval < 0) return -1;
 	
-	result->print();
 
 	std::cout << "time elapsed: " << tv_2.tv_sec - tv_1.tv_sec << " seconds" << tv_2.tv_usec - tv_1.tv_usec << " microseconds" << std::endl;
-	result = *matrix*x;
-	result->print();
 }
