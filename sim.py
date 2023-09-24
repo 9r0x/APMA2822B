@@ -27,7 +27,14 @@ def main():
         # Repeat and take average
         for _ in range(REP):
             results.append(float(run(rows, cols)))
-        print(f"rows: {rows:5d}, cols: {cols:5d}, time: {(sum(results) / len(results)):.2f}ms")
+        # time in ms
+        time = sum(results) / len(results)
+        print(f"rows: {rows:5d}, cols: {cols:5d}, time: {time:5.2f}ms")
+        ai = rows*cols*2 / (8*(rows*cols + cols + rows))
+        print(f"Aritmetic Intensity: {ai:.3f}")
+        # GFLOPS
+        floprate = rows*cols*2 / time / 1e3
+        print(f"Flop rate: {floprate:.2f}GFlops/s")
 
 if __name__ == "__main__":
     main()
