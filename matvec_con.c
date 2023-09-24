@@ -1,9 +1,12 @@
 #include <stdio.h>
 #include <omp.h>
 #include <stdlib.h>
+#include <ctime>
 
 int main(int argc, char *argv[])
 {
+
+    srand(time(NULL));
     if (argc != 3)
     {
         printf("Usage: %s ROWS COLS\n", argv[0]);
@@ -13,34 +16,48 @@ int main(int argc, char *argv[])
     int ROWS = atoi(argv[1]);
     int COLS = atoi(argv[2]);
 
-    int *A = NULL;
-    int *x = NULL, *y = NULL;
+    float *A = NULL;
+    float *x = NULL, *y = NULL;
 
-    A = (int *)malloc(ROWS * COLS * sizeof(int));
-    x = (int *)malloc(COLS * sizeof(int));
-    y = (int *)malloc(ROWS * sizeof(int));
+    A = (float *)malloc(ROWS * COLS * sizeof(float));
+    x = (float *)malloc(COLS * sizeof(float));
+    y = (float *)malloc(ROWS * sizeof(float));
 
-    // #pragma omp parallel for // collapse(2)
     for (int i = 0; i < ROWS; i++)
     {
-        x[i] = rand() % 10;
+        x[i] = (float)rand() / RAND_MAX;
         for (int j = 0; j < COLS; ++j)
-            (&A[i])[j] = rand() % 10;
+            (&A[i * ROWS])[j] = (float)rand() / RAND_MAX;
     }
 
 #ifdef DEBUG
-    printf("Initialized\n");
+    printf("A = [");
+    for (int i = 0; i < ROWS; i++)
+    {
+        printf("[");
+        for (int j = 0; j < COLS; j++)
+        {
+            printf("%f ", (&A[i * ROWS])[j]);
+        }
+        printf("]\n");
+    }
+    printf("]\n");
+
+    printf("x = [");
+    for (int i = 0; i < ROWS; i++)
+    {
+        printf("%f ", x[i]);
+    }
+    printf("]\n");
 #endif
 
     double t1 = omp_get_wtime();
-    // #pragma omp parallel for
     for (int i = 0; i < ROWS; i++)
     {
-        int rowSum = 0;
-        // #pragma omp parallel for (reduction + : rowSum)
+        float rowSum = 0;
         for (int j = 0; j < COLS; j++)
         {
-            rowSum = (&A[i])[j] * x[j];
+            rowSum = (&A[i * ROWS])[j] * x[j];
         }
         y[i] = rowSum;
     }
@@ -50,7 +67,7 @@ int main(int argc, char *argv[])
     printf("y = [");
     for (int i = 0; i < ROWS; i++)
     {
-        printf("%d ", y[i]);
+        printf("%f ", y[i]);
     }
     printf("]\n");
 #endif
