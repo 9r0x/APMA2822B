@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
     x = (int *)malloc(COLS * sizeof(int));
     y = (int *)malloc(ROWS * sizeof(int));
 
-#pragma omp parallel for // collapse(2)
+    // #pragma omp parallel for // collapse(2)
     for (int i = 0; i < ROWS; i++)
     {
         A[i] = (int *)malloc(COLS * sizeof(int));
@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
 #endif
 
     double t1 = omp_get_wtime();
-#pragma omp parallel for
+    // #pragma omp parallel for
     for (int i = 0; i < ROWS; i++)
     {
         int rowSum = 0;
