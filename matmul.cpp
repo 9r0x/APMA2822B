@@ -3,6 +3,9 @@
 #include <cmath>
 #include <cassert>
 #include <sys/time.h>
+#include <cstdlib>
+
+#define SEPALLOC
 
 class Matrix;
 double** ndarray(int, int);
@@ -14,7 +17,13 @@ class Matrix {
 		int num_cols;
 		double** mat;
 		Matrix(int rws, int cls): num_rows(rws), num_cols(cls) {
+#ifdef SEPALLOC
+			std::cout << "allocating heap separately" << std::endl;
+			mat = separate_alloc(this->num_rows, this->num_cols);
+#else
+			std::cout << "allocating heap continuously" << std::endl;
 			mat = ndarray(this->num_rows, this->num_cols);
+#endif
 		}
 		Matrix* operator*(const Matrix* MB){
 			assert(this->num_cols == MB->num_rows);
@@ -56,13 +65,21 @@ class Matrix {
 
 };
 
+
 double** ndarray(int num_rows, int num_cols) {
 	double** mat = new double*[num_rows];
 	mat[0] = new double[num_rows*num_cols];
 	for (int i=0; i<num_rows; ++i) {
 		mat[i] = mat[0] + i*num_cols;
 	}
-	for (int i=0; i<num_rows*num_cols; ++i) mat[0][i] = 0.00;
+	return mat;
+}
+
+double** separate_alloc(int num_rows, int num_cols) {
+	double** mat = new double*[num_rows];
+	for (int i=0; i<num_rows; ++i) {
+		mat[i] = new double[num_cols];
+	}
 	return mat;
 }
 
@@ -87,14 +104,21 @@ Matrix* matmul(const Matrix* MA, const Matrix* MB) {
 	return result;
 }
 
-int main() {
+int main(int argc, const char * argv[]) {
+    if (argc != 4) {
+		std::cerr << "Usage: " << argv[0] << " <arg1> <arg2> <arg3>" << std::endl;
+		return 1; // Return an error code
+	}
 	int dim1, dim2, dim3;
-	std::cout << "The number of rows for the first matrix: " << std::endl;
-	std::cin >> dim1;
-	std::cout << "The number of cols for the first matrix: " << std::endl;
-	std::cin >> dim2;
-    std::cout << "The number of cols for the second matrix: " << std::endl;
-	std::cin >> dim3;
+	dim1 = std::atoi(argv[1]);
+	dim2 = std::atoi(argv[2]);
+	dim3 = std::atoi(argv[3]);
+	// std::cout << "The number of rows for the first matrix: " << std::endl;
+	// std::cin >> dim1;
+	// std::cout << "The number of cols for the first matrix: " << std::endl;
+	// std::cin >> dim2;
+    // std::cout << "The number of cols for the second matrix: " << std::endl;
+	// std::cin >> dim3;
 	//std::cout << num_rows << " " << num_cols << std::endl;
 
 	Matrix* matrix = new Matrix(dim1, dim2);
