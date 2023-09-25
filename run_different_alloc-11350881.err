@@ -1,0 +1,4 @@
+  File "sim.py", line 12
+    pattern = r"time elpased: (\d+\.?\d*e[+\-]?\d+) seconds" 
+                                                            ^
+TabError: inconsistent use of tabs and spaces in indentation

@@ -1,0 +1,9 @@
+## SLURM PROLOG ###############################################################
+##    Job ID : 11350881
+##  Job Name : run_different_alloc
+##  Nodelist : node1325
+##      CPUs : 1
+##  Mem/Node : 10240 MB
+## Directory : /oscar/scratch/jzheng70/2822b/hw1/APMA2822B
+##   Job Started : Sun Sep 24 16:11:25 EDT 2023
+###############################################################################
