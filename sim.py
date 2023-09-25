@@ -16,7 +16,7 @@ def run(rows, cols):
 
 def main():
     # exp = 5 takes too long
-    exp = range(1, 5)
+    exp = range(1, 6)
     for i in exp:
         rows = 10 ** i
         cols = 10 ** i

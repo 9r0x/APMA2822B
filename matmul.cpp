@@ -83,12 +83,7 @@ float** separate_alloc(int num_rows, int num_cols) {
 	return mat;
 }
 
-Matrix* matmul(const Matrix* MA, const Matrix* MB) {
-	// int num_rows = sizeof(matrix) / sizeof(float*);
-	// int num_rows = matrix->num_rows;
-	// int num_cols = sizeof(matrix[0]) / sizeof(float);
-	// int num_cols = matrix->num_cols; 
-	// assert(MA->num_cols == MB->num_rows);
+Matrix* matmul_unrolled(const Matrix* MA, const Matrix* MB) {
 	Matrix* result = new Matrix(MA->num_rows, MB->num_cols);
 
 	struct timeval tv_1, tv_2;
@@ -98,13 +93,37 @@ Matrix* matmul(const Matrix* MA, const Matrix* MB) {
 #pragma omp parallel
 {
 #pragma omp for
-	// for (int i=0; i < MA->num_rows; ++i) {
-	// 	for (int k=0; k < MB->num_cols; ++k) {
-	// 		for (int j=0; j < MA->num_cols; ++j) {
-	// 			result->mat[i][k] += MA->mat[i][j] * MB->mat[j][k];
-	// 		}
-	// 	}	
-	// }
+	for (int i=0; i < MA->num_rows; ++i) {
+		int j;
+		for (j=0; j < MA->num_cols-4; j+=4) {
+			result->mat[i][0] += MA->mat[i][j] * MB->mat[j][0];
+			result->mat[i][0] += MA->mat[i][j+1] * MB->mat[j+1][0];
+			result->mat[i][0] += MA->mat[i][j+2] * MB->mat[j+2][0];
+			result->mat[i][0] += MA->mat[i][j+3] * MB->mat[j+3][0];
+		} 
+		for (; j< MA->num_cols; ++j) {
+			result->mat[i][0] += MA->mat[i][j] * MB->mat[j][0];
+		}
+	}
+}
+	retval = gettimeofday(&tv_2, 0);
+	if (retval < 0) return NULL;
+	
+	float delta = ((tv_2.tv_sec - tv_1.tv_sec) * 1000000u + tv_2.tv_usec - tv_1.tv_usec);	
+
+	std::cout << "time elpased: " << delta << " microseconds" << std::endl;
+	return result;
+}
+Matrix* matmul(const Matrix* MA, const Matrix* MB) {
+	Matrix* result = new Matrix(MA->num_rows, MB->num_cols);
+
+	struct timeval tv_1, tv_2;
+
+	int retval = gettimeofday(&tv_1, 0);
+	if (retval < 0) return NULL;
+#pragma omp parallel
+{
+#pragma omp for
 	for (int i=0; i < MA->num_rows; ++i) {
 		for (int j=0; j < MA->num_cols; ++j) {
 			result->mat[i][0] += MA->mat[i][j] * MB->mat[j][0];
@@ -139,7 +158,9 @@ int main(int argc, const char * argv[]) {
 
 	Matrix* matrix = new Matrix(dim1, dim2);
 	Matrix* x = new Matrix(dim2, dim3);
-	
+#ifndef UNROLL	
 	Matrix* result = matmul(matrix, x);
-	
+#else
+	Matrix* result = matmul_unrolled(matrix, x);
+#endif
 }
