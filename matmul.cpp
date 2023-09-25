@@ -107,7 +107,7 @@ Matrix* matmul(const Matrix* MA, const Matrix* MB) {
 	// }
 	for (int i=0; i < MA->num_rows; ++i) {
 		for (int j=0; j < MA->num_cols; ++j) {
-			result->mat[i][0] = MA->mat[i][j] * MB->mat[j][0];
+			result->mat[i][0] += MA->mat[i][j] * MB->mat[j][0];
 		} 
 	}
 }
